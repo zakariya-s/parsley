@@ -18,7 +18,7 @@ libraryDependencySchemes ++= Seq(
 )
 
 addSbtPlugin("org.typelevel" % "sbt-typelevel" % sbtTypelevelVersion)
-addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % sbtTypelevelVersion)
+//addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % sbtTypelevelVersion)
 
 // CI Stuff
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.13.2")

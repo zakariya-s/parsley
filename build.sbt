@@ -33,7 +33,7 @@ inThisBuild(List(
   githubWorkflowAddedJobs += testCoverageJob(githubWorkflowGeneratedCacheSteps.value.toList),
   githubWorkflowConcurrency := None, // this allows us to not fail the pipeline on double commit
   // Website Configuration
-  tlSitePublishBranch := Some(mainBranch),
+  //tlSitePublishBranch := Some(mainBranch),
 ))
 
 lazy val root = tlCrossRootProject.aggregate(parsley, parsleyDebug)
@@ -112,7 +112,7 @@ lazy val parsleyDebug = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     ),
   )
 
-lazy val docs = project
+/*lazy val docs = project
   .in(file("site"))
   .dependsOn(parsley.jvm)
   .enablePlugins(ParsleySitePlugin)
@@ -126,7 +126,7 @@ lazy val docs = project
         "org.typelevel" %% "cats-core" % "2.10.0",
         "com.github.j-mie6" %% "parsley-cats" % "1.3.0"
     ),
-  )
+  )*/
 
 def testCoverageJob(cacheSteps: List[WorkflowStep]) = WorkflowJob(
     id = "coverage",
