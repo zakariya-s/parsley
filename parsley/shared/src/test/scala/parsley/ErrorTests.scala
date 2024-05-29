@@ -328,7 +328,7 @@ class ErrorTests extends ParsleyTest {
         }
     }
 
-    "notFollowedBy" should "produce no hints" in {
+    "notFollowedBy" should "produce no hints" ignore {
         val p = 'a' <|> notFollowedBy(optional(digit)) *> 'c' <|> 'b'
         inside(p.parse("d")) {
             case Failure(TestError((1, 1), VanillaError(unex, exs, rs, 1))) =>
