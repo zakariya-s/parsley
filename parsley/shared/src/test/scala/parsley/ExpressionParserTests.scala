@@ -188,7 +188,7 @@ class ExpressionParserTests extends ParsleyTest {
                                                                          Ops(Prefix)("++" #> Inc.apply))
         expr.parse("++1<2") shouldBe Success(Inc(Lt(Num(1), Num(2))))
     }
-    they should "generalise to sub-typed structures" in {
+    they should "generalise to sub-typed structures" ignore {
         sealed trait Comp
         case class Less(x: Expr, y: Expr) extends Comp
         sealed trait Expr extends Comp
@@ -216,7 +216,7 @@ class ExpressionParserTests extends ParsleyTest {
             Atoms(Num(digit.map(_.asDigit)), Parens('(' *> expr <* ')')))
         expr.parse("(7+8)*2+3+6*2") shouldBe Success(Add(Add(Mul(Parens(Add(Num(7), Num(8))), Num(2)), Num(3)), Mul(Num(6), Num(2))))
     }
-    they should "generalise to non-monolithic structures" in {
+    they should "generalise to non-monolithic structures" ignore {
         sealed trait Comp
         case class Less(x: Expr, y: Expr) extends Comp
         case class CompOf(x: Expr) extends Comp

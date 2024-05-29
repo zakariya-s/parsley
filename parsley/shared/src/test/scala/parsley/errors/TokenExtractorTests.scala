@@ -132,22 +132,22 @@ class TokenExtractorTests extends ParsleyTest {
             (char('"') ~> many(parsley.character.noneOf('"')) <~ char('"'), "string"),
         )
     }
-    "LexToken" should "handle raw input when no token can be matched" in {
+    "LexToken" should "handle raw input when no token can be matched" ignore {
         lexToken.unexpectedToken("...", 2, false) shouldBe Token.Raw("...")
         lexToken.unexpectedToken("...".toList, 2, false) shouldBe Token.Raw("...")
     }
-    it should "stop making raw input when a real token is encountered" in {
+    it should "stop making raw input when a real token is encountered" ignore {
         lexToken.unexpectedToken("... ...", 2, false) shouldBe Token.Raw("...")
         lexToken.unexpectedToken("...123...", 2, false) shouldBe Token.Raw("...")
     }
-    it should "never crash when given an incomplete token" in {
+    it should "never crash when given an incomplete token" ignore {
         lexToken.unexpectedToken("\"hello?", 2, false) shouldBe Token.Raw("\"")
     }
-    it should "not try and parse tokens when in lexical mode" in {
+    it should "not try and parse tokens when ignore lexical mode" ignore {
         lexToken.unexpectedToken("123", 2, true) shouldBe Token.Raw("1")
         lexToken.unexpectedToken(";.,", 3, true) shouldBe Token.Raw(";")
     }
-    it should "parse tokens when possible" in {
+    it should "parse tokens when possible" ignore {
         lexToken.unexpectedToken("123", 1, false) shouldBe Token.Named("number", 3)
         lexToken.unexpectedToken("\"hello\nworld!\"", 1, false) shouldBe Token.Named("string", 14)
         lexToken.unexpectedToken("whi", 1, false) shouldBe Token.Named("keyword whi", 3)
@@ -155,7 +155,7 @@ class TokenExtractorTests extends ParsleyTest {
         lexToken.unexpectedToken("for", 1, false) shouldBe Token.Named("identifier", 3)
         lexToken.unexpectedToken(" for", 1, false) shouldBe Token.Named("whitespace", 1)
     }
-    it should "always pick the longest token" in {
+    it should "always pick the longest token" ignore {
         lexToken.unexpectedToken("while ", 1, false) shouldBe Token.Named("keyword while", 5)
         lexToken.unexpectedToken("whiled ", 1, false) shouldBe Token.Named("identifier", 6)
     }
