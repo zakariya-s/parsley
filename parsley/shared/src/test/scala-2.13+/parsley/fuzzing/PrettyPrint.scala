@@ -50,6 +50,7 @@ object PrettyPrint {
         override def prettyPrint(obj: Boolean, ctx: List[String], depth: Int): (String, List[String]) = (s"${Indent * depth}$obj", ctx)
     }
 
+    // This is dead-code but we need this for the empty combinator
     implicit def prettyPrintNothing: PrettyPrint[Nothing] = new PrettyPrint[Nothing] {
         override def prettyPrint(obj: Nothing, ctx: List[String], depth: Int): (String, List[String]) = (s"${Indent * depth}<Nothing>", ctx)
     }

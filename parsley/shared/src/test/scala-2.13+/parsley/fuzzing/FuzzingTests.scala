@@ -20,7 +20,7 @@ class FuzzingTests extends AnyPropSpec with ScalaCheckPropertyChecks with Matche
 
         // val parser = ParserGen.genParser.apply(Parameters.default, Seed.apply(6882825281813765860L)).get
 
-        forAll(ParserGen.genParser -> "parser"/*, minSuccessful(1000)*//*, minSize(50), sizeRange(100)*/) { parser =>
+        forAll(ParserGen.genParser -> "parser") { parser =>
             //implicit val noShrink: Shrink[String] = Shrink.shrinkAny
 
             // Assert that correct() is correct...
@@ -33,7 +33,7 @@ class FuzzingTests extends AnyPropSpec with ScalaCheckPropertyChecks with Matche
     }
 
     property("semantically-equivalent de-optimized and optimized parsers should behave the same") {
-        forAll(ParserGen.genParser -> "parser"/*, minSuccessful(1000)*//*, minSize(50), sizeRange(100)*/) { parser =>
+        forAll(ParserGen.genParser -> "parser") { parser =>
             parser.correct(Set()).isRight shouldBe true
 
             // forAll(parser.disableOptimizations.generate -> "de-optimized refined parser") { internal =>
@@ -63,13 +63,12 @@ class FuzzingTests extends AnyPropSpec with ScalaCheckPropertyChecks with Matche
     }*/
 
     // Invalid parser tests
-    // Broken right now, refactoring
 
     // property("failing parsers should produce the same error message upon optimization") {
-    //     forAll(ParserGen.genInvalidParser -> "invalid parser", minSuccessful(10000)/*, minSize(50), sizeRange(100)*/) { case (parser, _) =>
+    //     forAll(ParserGen.genInvalidParser -> "invalid parser") { case (parser, lastFailed) =>
     //         // parser.correctInvalid(false) shouldBe true
 
-    //         forAll(parser.generateInvalid -> "unoptimised invalid refined parser") { internal =>
+    //         forAll(parser.generateInvalid(lastFailed) -> "unoptimised invalid refined parser") { internal =>
     //             forAll(Gen.const(internal.optimize.disableOptimizations) -> "optimized invalid refined parser") { optimizedInternal =>
     //                 internal.generate.parse(internal.input) shouldBe optimizedInternal.generate.parse(internal.input)
     //             }
@@ -83,7 +82,7 @@ class FuzzingTests extends AnyPropSpec with ScalaCheckPropertyChecks with Matche
     /*property("first parser law LHS-to-RHS should work") {
         implicit def noShrink[T]: Shrink[T] = Shrink.shrinkAny
         import ParsleyInternalUnwrapped._
-        forAll(ParserGen.parserLaw1LhsToRhs(false) -> "parser", minSuccessful(1000)/*, minSize(50), sizeRange(100)*/) { case (parser, _) =>
+        forAll(ParserGen.parserLaw1LhsToRhs(false) -> "parser") { case (parser, _) =>
             forAll(parser.generate -> "original parser LHS") { internal =>
                 val transformedParser = internal match {
                     case par @ Ap(Or(p, Pure(f), leftParser), q) => Or(Ap(p, q)(q.evPrettyPrint, par.evPrettyPrint), Map(q, f)(par.evPrettyPrint), leftParser)(par.evPrettyPrint)
@@ -101,7 +100,7 @@ class FuzzingTests extends AnyPropSpec with ScalaCheckPropertyChecks with Matche
     /*property("first parser law RHS-to-LHS should work") {
         implicit def noShrink[T]: Shrink[T] = Shrink.shrinkAny
         import ParsleyInternalUnwrapped._
-        forAll(ParserGen.parserLaw1RhsToLhs(false) -> "parser", minSuccessful(1000)/*, minSize(50), sizeRange(100)*/) { case (parser, _) =>
+        forAll(ParserGen.parserLaw1RhsToLhs(false) -> "parser") { case (parser, _) =>
             forAll(parser.generate -> "original parser RHS") { internal =>
                 val transformedParser = internal match {
                     case par @ Or(Ap(p, q), Map(_, f), leftParser) => Ap(Or(p, Pure(f), leftParser), q)(q.evPrettyPrint, par.evPrettyPrint)
@@ -122,7 +121,7 @@ class FuzzingTests extends AnyPropSpec with ScalaCheckPropertyChecks with Matche
     /*property("second parser law should work") {
         implicit def noShrink[T]: Shrink[T] = Shrink.shrinkAny
         import ParsleyInternalUnwrapped._
-        forAll(ParserGen.parserLaw2(false) -> "parser", minSuccessful(1000)/*, minSize(50), sizeRange(100)*/) { case (parser, _) =>
+        forAll(ParserGen.parserLaw2(false) -> "parser") { case (parser, _) =>
             forAll(parser.generate -> "original parser LHS") { internal =>
                 val transformedParser = internal match {
                     case Or(Atomic(Then(p, q)), Then(r, _), leftParser) => Then(Sum(Atomic(p)(p.evPrettyPrint), r, leftParser)(p.evPrettyPrint, r.evPrettyPrint), q)(q.evPrettyPrint)

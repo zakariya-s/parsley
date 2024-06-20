@@ -16,7 +16,7 @@ sealed abstract class ParsleyInternal[+T: PrettyPrint] {
 
     final def generate: Gen[ParsleyInternalUnwrapped[T]] = generate(1).map(_.head)
 
-    final def generateInvalid: Gen[ParsleyInternalUnwrapped[T]] = generateInvalid(1, false).suchThat(_._2).map(_._1.headOption.getOrElse(throw new Exception("Expected one invalid parser but got none")))
+    final def generateInvalid(lastFailed: Boolean): Gen[ParsleyInternalUnwrapped[T]] = generateInvalid(1, lastFailed).suchThat(_._2).map(_._1.headOption.getOrElse(throw new Exception("Expected one invalid parser but got none")))
 
     // Use Stream even though it is deprecated due to ScalaCheck requiring it
     @nowarn("cat=deprecation") def shrink: Stream[ParsleyInternal[T]]
@@ -711,7 +711,7 @@ object ParsleyInternal {
         override def generate(n: Int): Gen[List[ParsleyInternalUnwrapped[T]]] = for {
             nodeInternal <- node.generate(n)
             // Collect the possible outputs to filter on - this should NEVER fail
-            outputs = nodeInternal.map(_.output.get).toSet
+            outputs = nodeInternal.map(_.output).collect { case Some(x) => x }.toSet
             internal = nodeInternal.map(ParsleyInternalUnwrapped.Filter(_, outputs))
         } yield internal
 
@@ -1165,7 +1165,7 @@ object ParsleyInternal {
     final case class Collect[T: PrettyPrint, U: PrettyPrint](node: ParsleyInternal[T], res: U) extends ParsleyInternal[U] {
         override def generate(n: Int): Gen[List[ParsleyInternalUnwrapped[U]]] = for {
             nodeInternal <- node.generate(n)
-            outputs = nodeInternal.map(_.output.get).toSet
+            outputs = nodeInternal.map(_.output).collect { case Some(x) => x }.toSet
             internal = nodeInternal.map(ParsleyInternalUnwrapped.Collect(_, outputs, res))
         } yield internal
 
@@ -1204,7 +1204,7 @@ object ParsleyInternal {
     final case class MapFilter[T: PrettyPrint, U: PrettyPrint](node: ParsleyInternal[T], res: U) extends ParsleyInternal[U] {
         override def generate(n: Int): Gen[List[ParsleyInternalUnwrapped[U]]] = for {
             nodeInternal <- node.generate(n)
-            outputs = nodeInternal.map(_.output.get).toSet
+            outputs = nodeInternal.map(_.output).collect { case Some(x) => x }.toSet
             internal = nodeInternal.map(ParsleyInternalUnwrapped.MapFilter(_, outputs, res))
         } yield internal
 
@@ -1868,8 +1868,8 @@ object ParsleyInternal {
         } yield internal
 
         override def generateInvalid(n: Int, lastFailed: Boolean): Gen[(List[ParsleyInternalUnwrapped[HomogeneousExpr]], Boolean)] = for {
-            atomInternals <- Gen.sequence[List[ParsleyInternalUnwrapped[HomogeneousExpr]], ParsleyInternalUnwrapped[HomogeneousExpr]](atoms.map(_.generateInvalid))
-            opInternals <- Gen.sequence[List[(Fixity, List[ParsleyInternalUnwrapped[Any]])], (Fixity, List[ParsleyInternalUnwrapped[Any]])](ops.map { case (f, p) => Gen.sequence[List[ParsleyInternalUnwrapped[Any]], ParsleyInternalUnwrapped[Any]](p.map(_.generateInvalid)).map(f -> _) })
+            atomInternals <- Gen.sequence[List[ParsleyInternalUnwrapped[HomogeneousExpr]], ParsleyInternalUnwrapped[HomogeneousExpr]](atoms.map(_.generateInvalid(lastFailed)))
+            opInternals <- Gen.sequence[List[(Fixity, List[ParsleyInternalUnwrapped[Any]])], (Fixity, List[ParsleyInternalUnwrapped[Any]])](ops.map { case (f, p) => Gen.sequence[List[ParsleyInternalUnwrapped[Any]], ParsleyInternalUnwrapped[Any]](p.map(_.generateInvalid(lastFailed))).map(f -> _) })
             internal <- Gen.listOfN(n, generateExpr(ops.length + 1, atomInternals, opInternals).map { case (input, output) => ParsleyInternalUnwrapped.HomogeneousPrecedence(atomInternals, opInternals, input, output) })
         } yield (internal, lastFailed)
 
